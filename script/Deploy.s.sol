@@ -8,8 +8,8 @@ import "../src/PenelopesKey.sol";
 contract Deploy is Script {
     // Deployments
     PenelopesKey public pkey;
-    address signer = 0x5b8F11C2c1E33f0857c12Da896bF7c86A8101023;
-    address withdraw = 0x5b8F11C2c1E33f0857c12Da896bF7c86A8101023;
+    address signer = vm.envAddress("PKEY_SIGNER_ADDRESS");
+    address withdraw = vm.envAddress("PUBLIC_KEY_TESTNET_DEPLOYER");
     uint256 totalTickets = 6000;
 
     function run() external {
@@ -19,10 +19,8 @@ contract Deploy is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         pkey = new PenelopesKey(signer);
-        // initialize bins
-        pkey.addTickets(totalTickets);
         //set active session
-        pkey.setSession(1);
+        // pkey.setSession(1);
 
         vm.stopBroadcast();
     }

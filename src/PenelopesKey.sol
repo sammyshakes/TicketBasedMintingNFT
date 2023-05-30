@@ -44,29 +44,22 @@ contract PenelopesKey is ERC721AQueryable, Ownable, Pausable, ERC2981 {
         _safeMint(_msgSender(), amount);
     }
 
-    function mintWithTicket(
-        uint256[] calldata ticketNumbers,
-        bytes[] calldata signatures
-    ) external payable whenNotPaused {
+    function mintWithTicket(uint256[] calldata ticketNumbers, bytes[] calldata signatures)
+        external
+        payable
+        whenNotPaused
+    {
         require(ticketNumbers.length == signatures.length, "Mismatch Arrays");
-        require(
-            totalSupply() + ticketNumbers.length <= maxSupply,
-            "Max amount reached"
-        );
+        require(totalSupply() + ticketNumbers.length <= maxSupply, "Max amount reached");
         require(ticketNumbers.length < 4, "Max 3 Tickets");
-        require(
-            msg.value >= mintPrice * ticketNumbers.length,
-            "Did not send enough ether"
-        );
+        require(msg.value >= mintPrice * ticketNumbers.length, "Did not send enough ether");
 
         for (uint256 i; i < ticketNumbers.length; i++) {
             require(
-                allowListSigner ==
-                    getTicket(
-                        msg.sender,
-                        ticketNumbers[i],
-                        uint8(activeSession)
-                    ).toEthSignedMessageHash().recover(signatures[i]),
+                allowListSigner
+                    == getTicket(msg.sender, ticketNumbers[i], uint8(activeSession)).toEthSignedMessageHash().recover(
+                        signatures[i]
+                    ),
                 "ticket not valid"
             );
             claimTicket(ticketNumbers[i]);
@@ -76,11 +69,7 @@ contract PenelopesKey is ERC721AQueryable, Ownable, Pausable, ERC2981 {
         _safeMint(_msgSender(), ticketNumbers.length);
     }
 
-    function getTicket(
-        address user,
-        uint256 ticketNumber,
-        uint8 session
-    ) public pure returns (bytes32) {
+    function getTicket(address user, uint256 ticketNumber, uint8 session) public pure returns (bytes32) {
         bytes32 hash = keccak256(abi.encodePacked(user, ticketNumber, session));
         return hash;
     }
@@ -101,20 +90,11 @@ contract PenelopesKey is ERC721AQueryable, Ownable, Pausable, ERC2981 {
         ticketMap[bin] = ticketMap[bin] & ~(uint256(1) << bit);
     }
 
-    function tokensOfOwner(address _owner)
-        external
-        view
-        returns (uint256[] memory)
-    {
+    function tokensOfOwner(address _owner) external view returns (uint256[] memory) {
         return _tokensOfOwner(_owner);
     }
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721A, IERC721A)
-        returns (string memory)
-    {
+    function tokenURI(uint256 tokenId) public view override (ERC721A, IERC721A) returns (string memory) {
         require(_exists(tokenId), "Token does not exist");
         return string(abi.encodePacked(baseURI, Strings.toString(tokenId)));
     }
@@ -132,15 +112,8 @@ contract PenelopesKey is ERC721AQueryable, Ownable, Pausable, ERC2981 {
         return (royaltyAddress, (salePrice * _royaltyPermille) / 1000);
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721A, IERC721A, ERC2981)
-        returns (bool)
-    {
-        return
-            interfaceId == type(IERC2981).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view override (ERC721A, IERC721A, ERC2981) returns (bool) {
+        return interfaceId == type(IERC2981).interfaceId || super.supportsInterface(interfaceId);
     }
 
     // OWNER ONLY //
@@ -197,7 +170,7 @@ contract PenelopesKey is ERC721AQueryable, Ownable, Pausable, ERC2981 {
         uint256 totalAmount = address(this).balance;
         bool sent;
 
-        (sent, ) = withdrawAddress.call{value: totalAmount}("");
+        (sent,) = withdrawAddress.call{value: totalAmount}("");
         require(sent, "Main: Failed to send funds");
     }
 
@@ -221,6 +194,7 @@ contract PenelopesKey is ERC721AQueryable, Ownable, Pausable, ERC2981 {
 
     //  ADMIN ONLY //
     mapping(address => bool) private _admins;
+
     modifier onlyAdmin() {
         require(!_admins[msg.sender], "Only Admins");
         _;
