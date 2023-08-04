@@ -1,7 +1,7 @@
 
 ## Smart Contract Overview
 
-# Penelope’s Key contract overview
+# TicketBasedMintingNFT contract overview
 
 An analysis of the functionality in Penelope’s Key contract that goes beyond the standard ERC721 functionality:
 
